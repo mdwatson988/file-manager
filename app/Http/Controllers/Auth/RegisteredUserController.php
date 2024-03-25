@@ -50,7 +50,8 @@ class RegisteredUserController extends Controller
         $file = new File();
         $file->name = $user->email;
         $file->is_directory = 1;
-//        $file->makeRoot()->save();
+//        $file->makeRoot();
+        $file->save();
 
         return redirect(route('myFiles', absolute: false));
     }
