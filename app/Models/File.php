@@ -6,13 +6,11 @@ use App\Traits\HasCreatorAndUpdater;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-//use Kalnoy\Nestedset\NodeTrait;
+use Kalnoy\Nestedset\NodeTrait;
 
 class File extends Model
 {
-    use HasFactory,
-//        NodeTrait,
-        SoftDeletes, HasCreatorAndUpdater;
+    use HasFactory, NodeTrait, SoftDeletes, HasCreatorAndUpdater;
 
     public function isOwnedBy($userId): bool
     {

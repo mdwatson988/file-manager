@@ -35,7 +35,7 @@ class FileController extends Controller
     {
         return File::query()
             ->whereIsRoot()
-            ->where('created_id', Auth::id())
+            ->where('created_by', Auth::id())
             ->firstOrFail();
     }
 }

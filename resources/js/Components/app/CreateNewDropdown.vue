@@ -1,6 +1,14 @@
 <script setup>
 
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
+import CreateDirectoryModal from "@/Components/app/CreateDirectoryModal.vue";
+import { ref } from "vue";
+
+const createDirectoryModal = ref(false);
+
+function showCreateDirectoryModal() {
+    createDirectoryModal.value = true;
+}
 </script>
 
 <template>
@@ -24,7 +32,8 @@ import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
             >
                 <div class="px-1 py-1">
                     <MenuItem v-slot="{ active }">
-                        <a class="text-gray-700 block px-4 py-2 text-sm">
+                        <a href="#" @click.prevent="showCreateDirectoryModal"
+                            class="text-gray-700 block px-4 py-2 text-sm">
                             New Folder
                         </a>
                     </MenuItem>
@@ -45,6 +54,7 @@ import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
             </MenuItems>
         </transition>
     </Menu>
+    <CreateDirectoryModal v-model="createDirectoryModal" />
 </template>
 
 <style scoped>
