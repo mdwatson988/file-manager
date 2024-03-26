@@ -36,11 +36,11 @@ class ParentIdBaseRequest extends FormRequest
         return [
             'parent_id' => [
                 Rule::exists(File::class, 'id')
-                ->where(function(Builder $query) {
-                    return $query
-                        ->where('is_directory', '=', 1)
-                        ->where('created_id', '=', Auth::id());
-                })
+                    ->where(function (Builder $query) {
+                        return $query
+                            ->where('is_directory', '=', 1)
+                            ->where('created_by', Auth::id());
+                    })
             ]
         ];
     }

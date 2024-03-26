@@ -2,8 +2,8 @@
 
 namespace App\Http\Requests;
 
+use App\Models\File;
 use Illuminate\Contracts\Validation\ValidationRule;
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 
@@ -16,14 +16,13 @@ class StoreDirectoryRequest extends ParentIdBaseRequest
      */
     public function rules(): array
     {
-        return array_merge(
-            parent::rules(),
+        return array_merge(parent::rules(),
             [
                 'name' => [
                     'required',
-                    Rule::unique('files', 'name')
+                    Rule::unique(File::class, 'name')
                         ->where('created_by', Auth::id())
-                        ->where('parent_id', $this->parent_id)
+                        ->where('parent_id', $this->parent_id) // not working
                         ->whereNull('deleted_at'),
                     ],
             ]);

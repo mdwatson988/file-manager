@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreDirectoryRequest;
+use App\Http\Resources\FileResource;
 use App\Models\File;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -12,7 +13,17 @@ class FileController extends Controller
 {
     public function myFiles(): Response
     {
-        return Inertia::render('MyFiles');
+        $folder = $this->getRoot();
+        $files = File::query()
+            ->where('parent_id', $folder->id)
+            ->where('created_by', Auth::id())
+            ->orderBy('is_directory', 'desc')
+            ->orderBy('created_at')
+            ->paginate(10);
+
+        $files = FileResource::collection($files);
+
+        return Inertia::render('MyFiles', compact('files'));
     }
 
     public function createDirectory(StoreDirectoryRequest $request): void
