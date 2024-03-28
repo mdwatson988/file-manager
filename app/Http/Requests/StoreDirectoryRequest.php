@@ -22,9 +22,9 @@ class StoreDirectoryRequest extends ParentIdBaseRequest
                     'required',
                     Rule::unique(File::class, 'name')
                         ->where('created_by', Auth::id())
-                        ->where('parent_id', $this->parent_id) // not working
+                        ->where('parent_id', $this->parent_id)
                         ->whereNull('deleted_at'),
-                    ],
+                ],
             ]);
     }
 

@@ -11,11 +11,18 @@ use Inertia\Response;
 
 class FileController extends Controller
 {
-    public function myFiles(): Response
+    public function renderMyFiles(string $directory = null): Response
     {
-        $folder = $this->getRoot();
+        if ($directory) {
+            $directory = File::query()
+                ->where('path', $directory)
+                ->where('created_by', Auth::id())
+                ->firstOrFail();
+        }
+        $directory ??= $this->getRoot();
+
         $files = File::query()
-            ->where('parent_id', $folder->id)
+            ->where('parent_id', $directory->id)
             ->where('created_by', Auth::id())
             ->orderBy('is_directory', 'desc')
             ->orderBy('created_at')
@@ -23,17 +30,15 @@ class FileController extends Controller
 
         $files = FileResource::collection($files);
 
-        return Inertia::render('MyFiles', compact('files'));
+        return Inertia::render('MyFiles', compact('files', 'directory'));
     }
 
     public function createDirectory(StoreDirectoryRequest $request): void
     {
         $data = $request->validated();
-        $parent = $request->parent;
 
-        if (!$parent) {
-            $parent = $this->getRoot();
-        }
+        $parent = $request->parent;
+        $parent ??= $this->getRoot();
 
         $file = new File();
         $file->is_directory = 1;

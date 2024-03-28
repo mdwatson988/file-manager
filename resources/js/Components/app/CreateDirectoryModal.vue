@@ -3,14 +3,16 @@ import Modal from "@/Components/Modal.vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import TextInput from "@/Components/TextInput.vue";
 import InputError from "@/Components/InputError.vue";
-import { useForm } from "@inertiajs/vue3";
+import { useForm, usePage } from "@inertiajs/vue3";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import { nextTick, ref } from "vue";
 
-const form = useForm({
+const form = useForm({ // this form contains the new directory data used to populate the StoreDirectoryRequest object on backend
     name: '',
+    parent_id: null,
 });
+const page = usePage();
 
 const directoryNameInput = ref(null);
 
@@ -27,6 +29,8 @@ function onShow() {
 }
 
 function createDirectory() {
+    form.parent_id = page.props.directory.id;
+
     form.post(route('directory.create'), {
         preserveScroll: true,
         onSuccess: () => {

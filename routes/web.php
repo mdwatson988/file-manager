@@ -18,7 +18,9 @@ Route::get('/', function () {
 Route::controller(FileController::class)
     ->middleware(['auth', 'verified'])
     ->group(function () {
-        Route::get('/my-files', 'myFiles')->name('myFiles');
+        Route::get('/my-files/{directory?}', 'renderMyFiles')
+            ->where('directory', '(.*)')
+            ->name('myFiles');
         Route::post('/create', 'createDirectory')->name('directory.create');
     });
 
