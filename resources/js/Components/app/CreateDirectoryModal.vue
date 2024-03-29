@@ -8,7 +8,7 @@ import SecondaryButton from "@/Components/SecondaryButton.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import { nextTick, ref } from "vue";
 
-const form = useForm({ // this form contains the new directory data used to populate the StoreDirectoryRequest object on backend
+const form = useForm({ // this form contains the new directory data used to populate the StoreDirectoryRequest object on backend. There must be a backend validation rule for each property in this object for the property to be available on the backend.
     name: '',
     parent_id: null,
 });

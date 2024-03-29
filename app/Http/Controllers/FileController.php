@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreDirectoryRequest;
+use App\Http\Requests\StoreFileRequest;
 use App\Http\Resources\FileResource;
 use App\Models\File;
 use Illuminate\Support\Facades\Auth;
@@ -30,7 +31,10 @@ class FileController extends Controller
 
         $files = FileResource::collection($files);
 
-        return Inertia::render('MyFiles', compact('files', 'directory'));
+        $ancestors = FileResource::collection([...$directory->ancestors, $directory]);
+//        $directory = new FileResource($directory);
+
+        return Inertia::render('MyFiles', compact('files', 'directory', 'ancestors'));
     }
 
     public function createDirectory(StoreDirectoryRequest $request): void
@@ -45,6 +49,22 @@ class FileController extends Controller
         $file->name = $data['name'];
 
         $parent->appendNode($file);
+    }
+
+    public function store(StoreFileRequest $request): void
+    {
+        $data = $request->validated();
+
+//        $parent = $request->parent;
+//        $parent ??= $this->getRoot();
+//
+//        foreach ($data['files'] as $file) {
+//            $file = new File();
+//            $file->is_directory = 0;
+////            $file->name = $file->n;
+//
+//            $parent->appendNode($file);
+//        }
     }
 
     private function getRoot(): File

@@ -3,6 +3,8 @@
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
 import CreateDirectoryModal from "@/Components/app/CreateDirectoryModal.vue";
 import { ref } from "vue";
+import FileUploadMenuItem from "@/Components/app/FileUploadMenuItem.vue";
+import DirectoryUploadMenuItem from "@/Components/app/DirectoryUploadMenuItem.vue";
 
 const createDirectoryModal = ref(false);
 
@@ -39,22 +41,14 @@ function showCreateDirectoryModal() {
                     </MenuItem>
                 </div>
                 <div class="px-1 py-1">
-                    <MenuItem v-slot="{ active }">
-                        <a class="text-gray-700 block px-4 py-2 text-sm">
-                            Upload Files
-                        </a>
-                    </MenuItem>
-                    <MenuItem v-slot="{ active }">
-                        <a class="text-gray-700 block px-4 py-2 text-sm">
-                            Upload Folder
-                        </a>
-                    </MenuItem>
+                    <FileUploadMenuItem/>
+                    <DirectoryUploadMenuItem/>
                 </div>
 
             </MenuItems>
         </transition>
     </Menu>
-    <CreateDirectoryModal v-model="createDirectoryModal" />
+    <CreateDirectoryModal v-model="createDirectoryModal"/>
 </template>
 
 <style scoped>
