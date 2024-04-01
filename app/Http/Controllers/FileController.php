@@ -6,6 +6,8 @@ use App\Http\Requests\StoreDirectoryRequest;
 use App\Http\Requests\StoreFileRequest;
 use App\Http\Resources\FileResource;
 use App\Models\File;
+use App\Models\User;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -54,17 +56,51 @@ class FileController extends Controller
     public function store(StoreFileRequest $request): void
     {
         $data = $request->validated();
+        $fileTree = $request->file_tree;
+        $parent = $request->parent;
+        $user = $request->user();
 
-//        $parent = $request->parent;
-//        $parent ??= $this->getRoot();
-//
-//        foreach ($data['files'] as $file) {
-//            $file = new File();
-//            $file->is_directory = 0;
-////            $file->name = $file->n;
-//
-//            $parent->appendNode($file);
-//        }
+        $parent ??= $this->getRoot();
+
+        if (!empty($fileTree)) {
+            $this->storeFileTree($fileTree, $parent, $user);
+        } else {
+            foreach ($data['files'] as $file) {
+                $this->storeFile($file, $user, $parent);
+            }
+        }
+    }
+
+    private function storeFile(UploadedFile $file, User $user, File $parent): void
+        /** @var UploadedFile $file */
+    {
+        $path = $file->store('/files/' . $user->id);
+
+        $model = new File();
+        $model->storage_path = $path;
+        $model->is_directory = 0;
+        $model->name = $file->getClientOriginalName();
+        $model->mime = $file->getMimeType();
+        $model->size = $file->getSize();
+
+        $parent->appendNode($model);
+    }
+
+    private function storeFileTree(array $fileTree, File $parent, User $user): void
+    {
+        foreach ($fileTree as $name => $file) {
+            if (is_array($file)) {
+                $directory = new File();
+                $directory->name = $name;
+                $directory->is_directory = 1;
+
+                $parent->appendNode($directory);
+
+                $this->storeFileTree($file, $directory, $user);
+            } else {
+                $this->storeFile($file, $user, $parent);
+            }
+        }
     }
 
     private function getRoot(): File

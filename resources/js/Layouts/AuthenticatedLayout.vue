@@ -41,15 +41,9 @@ function handleDrop(event) {
 function uploadFiles(files) {
     fileUploadForm.parent_id = page.props.directory.id;
     fileUploadForm.files = files;
-    console.log(files);
     fileUploadForm.relative_paths = [...files].map(file => file.webkitRelativePath);
 
-    fileUploadForm.post(route('file.store'), {
-        // preserveScroll: true,
-        // onSuccess: () => {
-        //     fileUploadForm.reset();
-        // },
-    });
+    fileUploadForm.post(route('file.store'));
 }
 </script>
 

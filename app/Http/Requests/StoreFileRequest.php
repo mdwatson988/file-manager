@@ -9,10 +9,9 @@ use Illuminate\Support\Facades\Auth;
 
 class StoreFileRequest extends ParentIdBaseRequest
 {
-    protected function prepareForValidation()
+    protected function prepareForValidation(): void
     {
         $paths = array_filter($this->relative_paths ?? [], fn($el) => $el != null);
-//        dd($paths);
 
         $this->merge([
             'relative_paths' => $paths,
@@ -34,8 +33,35 @@ class StoreFileRequest extends ParentIdBaseRequest
         $data = $this->validated();
 
         $this->replace([
-            'file_tree' => $this->buildFileTree($this->file_paths, $data['files'])
+            'file_tree' => $this->buildFileTree($this->relative_paths, $data['files'])
         ]);
+    }
+
+    private function buildFileTree($filePaths, $files): array
+    {
+        $filePaths = array_slice($filePaths, 0, count($files));
+        $filePaths = array_filter($filePaths, fn($el) => $el != null);
+
+        $tree = [];
+
+        foreach ($filePaths as $index => $filePath) {
+            $parts = explode('/', $filePath);
+
+            $currentNode = &$tree;
+            foreach ($parts as $i => $part) {
+                if (!isset($currentNode[$part])) {
+                    $currentNode[$part] = [];
+                }
+
+                if ($i === count($parts) - 1) {
+                    $currentNode[$part] = $files[$index];
+                } else {
+                    $currentNode = &$currentNode[$part];
+                }
+            }
+        }
+
+        return $tree;
     }
 
     /**
@@ -45,14 +71,15 @@ class StoreFileRequest extends ParentIdBaseRequest
      */
     public function rules(): array
     {
-        return array_merge(parent::rules(),
+        return array_merge(
+            parent::rules(),
             [
                 'files.*' => [
                     'required',
                     'file',
-                    function ($attribute, $value, $fail) {
-                        if (!$this->dirctory_name) { // if we are not creating a directory
-                            /** @var $value UploadedFile */
+                    function ($attribute, $value, $fail) { //custom validation rule
+                        /** @var $value UploadedFile */
+                        if (!$this->directory_name) { // if we are not creating a directory
                             $file = File::query()
                                 ->where('name', $value->getClientOriginalName())
                                 ->where('parent_id', $this->parent_id)
@@ -72,7 +99,6 @@ class StoreFileRequest extends ParentIdBaseRequest
                     'string',
                     function ($attribute, $value, $fail) {
                         if ($value) { // if uploading a directory
-                            /** @var $value UploadedFile */
                             $directory = File::query()
                                 ->where('name', $value)
                                 ->where('parent_id', $this->parent_id)
@@ -87,10 +113,5 @@ class StoreFileRequest extends ParentIdBaseRequest
                     }
                 ]
             ]);
-    }
-
-    private function buildFileTree($file_paths, $files)
-    {
-        
     }
 }
